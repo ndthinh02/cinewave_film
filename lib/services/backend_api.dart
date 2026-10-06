@@ -72,13 +72,29 @@ class BackendApi {
     await _saveAuth(r.data);
   }
 
-  Future<void> register(String name, String email, String password) async {
-    final r = await _post('/auth/register', {
-      'name': name,
-      'email': email,
-      'password': password,
-    });
-    await _saveAuth(r.data);
+  Future<void> register(
+    String name,
+    String email,
+    String password,
+  ) async {
+    try {
+      final r = await _post('/auth/register', {
+        'name': name.trim(),
+        'email': email.trim(),
+        'password': password,
+      });
+
+      print('REGISTER STATUS: ${r.statusCode}');
+      print('REGISTER DATA: ${r.data}');
+
+      await _saveAuth(r.data);
+    } on DioException catch (e) {
+      print('REGISTER ERROR STATUS: ${e.response?.statusCode}');
+      print('REGISTER ERROR DATA: ${e.response?.data}');
+      print('REGISTER ERROR MESSAGE: ${e.message}');
+
+      rethrow;
+    }
   }
 
   Future<void> _saveAuth(dynamic d) async {
